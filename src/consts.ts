@@ -18,5 +18,5 @@ export const ALL_PREFABS_PATTERN = '**/*.{prefab,unity}';
 /**
  * the regexp of match script guid in prefab file
  */
-// export const SCRIPT_EXPORT_NAME_REG = /(?:^|\s*)ExportName\s*:\s*(\w+)\s*(?:\s*|$)/i;
-export const SCRIPT_EXPORT_NAME_REG = new RegExp(`(?:^|\\s*)${ getConfigExportName() }\\s*:\\s*(\\w+)\\s*(?:\\s*|$)`, 'i');
+// export const SCRIPT_EXPORT_NAME_REG = /(?:^|\s*)ExportName\s*:\s*(\w+)\s*(?:\s*|$)/g;
+export const SCRIPT_EXPORT_NAME_REG = new RegExp(`(?:^|\\s*)${ getConfigExportName() }\\s*:\\s*(\\w+)\\s*(?:\\s*|$)`, 'g');

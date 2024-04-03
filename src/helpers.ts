@@ -35,23 +35,20 @@ export function uriIsPrefabFile(uri: vscode.Uri): boolean {
 export async function readAllScriptsFromDocument(uri: vscode.Uri): Promise<Set<string>> {
     const scriptSet = new Set<string>();
 
-    const reader = fs.createReadStream(uri.fsPath);
-    const rl = readline.createInterface({
-        input: reader,
-        // Note: we use the crlfDelay option to recognize all instances of CR LF
-        // ('\r\n') in input.txt as a single line break.
-        crlfDelay: Infinity,
+    const data = await fs.promises.readFile(uri.fsPath, {
+        encoding: 'utf8',
+    }).catch(err => {
+        console.error(err);
     });
 
-    for await (const line of rl) {
-        const matcher = line.match(SCRIPT_EXPORT_NAME_REG);
-        if (matcher) {
-            scriptSet.add(matcher[1]);
+    if (data) {
+        const matchers = data.matchAll(SCRIPT_EXPORT_NAME_REG);
+        if (matchers) {
+            for (const matcher of matchers) {
+                scriptSet.add(matcher[1]);
+            }
         }
     }
-
-    rl.close();
-    reader.close();
 
     return scriptSet;
 }

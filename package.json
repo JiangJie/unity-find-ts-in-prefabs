@@ -2,7 +2,7 @@
     "name": "unity-find-ts-in-prefabs",
     "displayName": "Unity Find TS In Prefabs",
     "description": "Find prefabs which depend on the TypeScript file",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "publisher": "jarvisjiang",
     "author": {
         "name": "Jarvis Jiang",
@@ -50,7 +50,12 @@
                 "findPrefabs.exportName": {
                     "type": "string",
                     "default": "ExportName",
-                    "description": "Field name of `ExportName` in JSBehaviour."
+                    "description": "Field name of `ExportName` in JSBehaviour, default is `ExportName`."
+                },
+                "findPrefabs.prefabsRoot": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Root directory path of prefab files, default is `workspace`."
                 }
             }
         }
@@ -79,5 +84,8 @@
         "typescript": "^5.4.3",
         "webpack": "^5.91.0",
         "webpack-cli": "^5.1.4"
+    },
+    "dependencies": {
+        "glob": "^10.3.12"
     }
 }

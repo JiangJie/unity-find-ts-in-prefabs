@@ -1,8 +1,9 @@
 import * as path from 'node:path';
 import * as vscode from 'vscode';
+import { glob } from 'glob';
 import { ALL_PREFABS_PATTERN, COMMAND_ID, LANGUAGE_ID } from './consts';
 import { diffWithTwoSets, getFileNameOfScriptFile, getNameOfActiveScriptFile, readAllScriptsFromDocument, uriIsPrefabFile } from './helpers';
-import { checkSettings } from './settings';
+import { checkSettings, getConfigPrefabsRoot, prefabsRootIsWorkspace } from './settings';
 
 interface WithFilePathQuickPickItem extends vscode.QuickPickItem {
     filePath: string;
@@ -161,11 +162,35 @@ function updateCacheWithUris(uris: vscode.Uri[] | null = null) {
 
             progress.report({ increment: 0 });
 
-            // or get all prefab files
-            const allUri = uris ?? (await vscode.workspace.findFiles(ALL_PREFABS_PATTERN, null));
+            let allUri = uris;
+            // search all
+            if (allUri == null) {
+                const globTimeLabel = 'unity-find-ts-in-prefabs: glob cache';
+                console.time(globTimeLabel);
 
-            for await (const uri of allUri) {
-                await readDocumentAndUpdateCache(uri);
+                if (prefabsRootIsWorkspace()) {
+                    // use workspace
+                    allUri = await vscode.workspace.findFiles(ALL_PREFABS_PATTERN, null)
+                } else {
+                    allUri = (await glob(ALL_PREFABS_PATTERN, {
+                        cwd: getConfigPrefabsRoot(),
+                        absolute: true,
+                        nodir: true,
+                    })).map(x => vscode.Uri.file(x));
+                }
+
+                console.timeEnd(globTimeLabel);
+            }
+
+            if (allUri) {
+                const buildTimeLabel = 'unity-find-ts-in-prefabs: build cache';
+                console.time(buildTimeLabel);
+
+                for await (const uri of allUri) {
+                    await readDocumentAndUpdateCache(uri);
+                }
+
+                console.timeEnd(buildTimeLabel);
             }
 
             progress.report({ increment: 100 });
@@ -192,6 +217,10 @@ async function buildCache() {
  * @returns
  */
 function upgradeCacheWhenPrefabChange(uri: vscode.Uri, isDelete: boolean): void {
+    if (!uriIsPrefabFile(uri)) {
+        return;
+    }
+
     // wait for build cache
     if (!cacheIsBuilt) {
         // record
@@ -215,24 +244,22 @@ function upgradeCacheWhenPrefabChange(uri: vscode.Uri, isDelete: boolean): void 
  * watch all prefab files change in workspace
  */
 function watchAllPrefabFiles(): void {
+    if (!prefabsRootIsWorkspace()) {
+        return;
+    }
+
     const watcher = vscode.workspace.createFileSystemWatcher(ALL_PREFABS_PATTERN);
 
     watcher.onDidCreate((uri) => {
-        if (uriIsPrefabFile(uri)) {
-            upgradeCacheWhenPrefabChange(uri, false);
-        }
+        upgradeCacheWhenPrefabChange(uri, false);
     });
 
     watcher.onDidChange((uri) => {
-        if (uriIsPrefabFile(uri)) {
-            upgradeCacheWhenPrefabChange(uri, false);
-        }
+        upgradeCacheWhenPrefabChange(uri, false);
     });
 
     watcher.onDidDelete((uri) => {
-        if (uriIsPrefabFile(uri)) {
-            upgradeCacheWhenPrefabChange(uri, true);
-        }
+        upgradeCacheWhenPrefabChange(uri, true);
     });
 }
 
