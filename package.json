@@ -1,47 +1,83 @@
 {
-  "name": "unity-find-ts-in-prefabs",
-  "displayName": "unity-find-ts-in-prefabs",
-  "description": "Find prefabs which depend on the TypeScript file",
-  "version": "0.0.1",
-  "engines": {
-    "vscode": "^1.87.0"
-  },
-  "categories": [
-    "Other"
-  ],
-  "activationEvents": [],
-  "main": "./dist/extension.js",
-  "contributes": {
-    "commands": [
-      {
-        "command": "unity-find-ts-in-prefabs",
-        "title": "Unity: Find TS In Prefabs"
-      }
-    ]
-  },
-  "scripts": {
-    "vscode:prepublish": "npm run package",
-    "compile": "npx webpack",
-    "watch": "npx webpack --watch",
-    "package": "npx webpack --mode production --devtool hidden-source-map",
-    "compile-tests": "npx tsc -p . --outDir out",
-    "watch-tests": "npx tsc -p . -w --outDir out",
-    "pretest": "npm run compile-tests && npm run compile && npm run lint",
-    "lint": "npx eslint src --ext ts",
-    "test": "npx vscode-test"
-  },
-  "devDependencies": {
-    "@types/mocha": "^10.0.6",
-    "@types/node": "^20.12.2",
-    "@types/vscode": "^1.87.0",
-    "@typescript-eslint/eslint-plugin": "^7.5.0",
-    "@typescript-eslint/parser": "^7.5.0",
-    "@vscode/test-cli": "^0.0.8",
-    "@vscode/test-electron": "^2.3.9",
-    "eslint": "^8.57.0",
-    "ts-loader": "^9.5.1",
-    "typescript": "^5.4.3",
-    "webpack": "^5.91.0",
-    "webpack-cli": "^5.1.4"
-  }
+    "name": "unity-find-ts-in-prefabs",
+    "displayName": "Unity Find TS In Prefabs",
+    "description": "Find prefabs which depend on the TypeScript file",
+    "version": "1.0.0",
+    "publisher": "jarvisjiang",
+    "author": {
+        "name": "Jarvis Jiang",
+        "email": "jiang115jie@gmail.com"
+    },
+    "repository": "https://github.com/JiangJie/unity-find-ts-in-prefabs",
+    "engines": {
+        "vscode": "^1.87.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [],
+    "main": "./dist/extension.js",
+    "contributes": {
+        "commands": [
+            {
+                "command": "unity-find-ts-in-prefabs",
+                "title": "Unity: Find TS In Prefabs"
+            }
+        ],
+        "menus": {
+            "commandPalette": [
+                {
+                    "command": "unity-find-ts-in-prefabs",
+                    "when": "editorLangId == typescript"
+                }
+            ],
+            "editor/context": [
+                {
+                    "command": "unity-find-ts-in-prefabs",
+                    "when": "editorFocus && editorLangId == typescript"
+                }
+            ],
+            "editor/title/context": [
+                {
+                    "command": "unity-find-ts-in-prefabs",
+                    "when": "resourceLangId == typescript"
+                }
+            ]
+        },
+        "configuration": {
+            "title": "Unity Find Prefabs",
+            "properties": {
+                "findPrefabs.exportName": {
+                    "type": "string",
+                    "default": "ExportName",
+                    "description": "Field name of `ExportName` in JSBehaviour."
+                }
+            }
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run package",
+        "compile": "npx webpack",
+        "watch": "npx webpack --watch",
+        "package": "npx webpack --mode production --devtool hidden-source-map",
+        "compile-tests": "npx tsc -p . --outDir out",
+        "watch-tests": "npx tsc -p . -w --outDir out",
+        "pretest": "npm run compile-tests && npm run compile && npm run lint",
+        "lint": "npx eslint src --ext ts",
+        "test": "npx vscode-test"
+    },
+    "devDependencies": {
+        "@types/mocha": "^10.0.6",
+        "@types/node": "^20.12.2",
+        "@types/vscode": "^1.87.0",
+        "@typescript-eslint/eslint-plugin": "^7.5.0",
+        "@typescript-eslint/parser": "^7.5.0",
+        "@vscode/test-cli": "^0.0.8",
+        "@vscode/test-electron": "^2.3.9",
+        "eslint": "^8.57.0",
+        "ts-loader": "^9.5.1",
+        "typescript": "^5.4.3",
+        "webpack": "^5.91.0",
+        "webpack-cli": "^5.1.4"
+    }
 }
